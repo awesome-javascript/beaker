@@ -13,7 +13,7 @@ import * as archivesDb from '../../dbs/archives'
 import hyperdrive from 'hyperdrive'
 
 // network modules
-import hyperdriveArchiveSwarm from 'hyperdrive-archive-swarm'
+import discoverySwarm from 'discovery-swarm'
 import hyperImport from 'hyperdrive-import-files'
 import { resolveDatDNS } from '../dns'
 
@@ -28,6 +28,18 @@ import getFolderSize from 'get-folder-size'
 // =
 
 import { DAT_MANIFEST_FILENAME } from '../../../lib/const'
+const DAT_DOMAIN = 'dat.local'
+const DEFAULT_DISCOVERY = [
+  'discovery1.publicbits.org',
+  'discovery2.publicbits.org'
+]
+const DEFAULT_BOOTSTRAP = [
+  'bootstrap1.publicbits.org:6881',
+  'bootstrap2.publicbits.org:6881',
+  'bootstrap3.publicbits.org:6881',
+  'bootstrap4.publicbits.org:6881'
+]
+
 
 // globals
 // =
@@ -380,7 +392,24 @@ export function swarm (key, opts) {
   // create
   log.debug('[DAT] Swarming archive', key)
   var archive = getArchive(key)
-  var s = hyperdriveArchiveSwarm(archive, opts)
+  var s = discoverySwarm({
+    id: archive.id,
+    hash: false,
+    utp: true,
+    tcp: true,
+    dns: {server: DEFAULT_DISCOVERY, domain: DAT_DOMAIN},
+    dht: {bootstrap: DEFAULT_BOOTSTRAP},
+    stream: function () {
+      return archive.replicate({ upload: true, download: true })
+    }
+  })
+  s.once('error', function () {
+    s.listen(0)
+  })
+  s.once('listening', function () {    
+    s.join(archive.discoveryKey)
+  })
+  s.listen(opts.port || 3282)
   swarms[key] = s
   archivesEvents.emit('update-archive', { key, isUploading: opts.upload, isDownloading: true })
 
