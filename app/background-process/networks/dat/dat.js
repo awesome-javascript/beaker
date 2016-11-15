@@ -363,7 +363,7 @@ export function writeArchiveFileFromPath (key, opts) {
 export function swarm (key, opts) {
   // massage inputs
   key = bufToStr(key.key || key)
-  opts = { upload: (opts && opts.upload), download: true, utp: true, tcp: true }
+  opts = { upload: true, download: true, utp: true, tcp: true }
 
   // fetch
   if (key in swarms) {
