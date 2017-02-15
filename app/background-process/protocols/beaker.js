@@ -98,7 +98,10 @@ function beakerServer (req, res) {
     return cb(200, 'OK', 'text/css', path.join(__dirname, 'stylesheets/builtin-pages.css'))
   }
   if (requestUrl === 'beaker:start') {
-    return cb(200, 'OK', 'text/html', path.join(__dirname, 'builtin-pages/favorites.html'))
+    return cb(200, 'OK', 'text/html', path.join(__dirname, 'builtin-pages/start.html'))
+  }
+  if (requestUrl === 'beaker:favorites') {
+    return cb(200, 'OK', 'text/html', path.join(__dirname, 'builtin-pages/beaker.html'))
   }
   if (requestUrl === 'beaker:history') {
     return cb(200, 'OK', 'text/html', path.join(__dirname, 'builtin-pages/history.html'))
@@ -120,6 +123,9 @@ function beakerServer (req, res) {
   }
   if (requestUrl === 'beaker:builtin-pages/settings.js') {
     return cb(200, 'OK', 'text/css', path.join(__dirname, 'builtin-pages/settings.build.js'))
+  }
+  if (requestUrl === 'beaker:builtin-pages/start.js') {
+    return cb(200, 'OK', 'text/css', path.join(__dirname, 'builtin-pages/start.build.js'))
   }
 
   // common assets
